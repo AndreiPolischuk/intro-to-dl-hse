@@ -28,7 +28,7 @@ class Linear(Module):
         :return: array of shape (batch_size, out_features)
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        return super().compute_output(input)
+        return input @ self.weight.T + self.bias
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
         """
