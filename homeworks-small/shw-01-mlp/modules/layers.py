@@ -114,6 +114,33 @@ class BatchNormalization(Module):
         :return: array of shape (batch_size, num_features)
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
+
+        if self.training:
+            self.mean = np.mean(input, axis=0)
+            self.var = np.var(input, axis=0, ddof=0)
+            self.input_mean = (input - self.mean)
+            self.norm_input = self.input_mean / np.sqrt(self.var + self.eps)
+
+            self.running_mean = self.running_mean * (1 - self.momentum) + self.momentum * self.mean
+            self.running_var = self.running_var * (1 - self.momentum) + self.momentum * self.var * input.shape[0] / (input.shape[0] - 1)
+
+
+
+            if self.affine:
+                return self.norm_input * self.weight + self.bias
+            return self.norm_input
+
+        normalized_output = (input - self.running_mean) / np.sqrt(self.running_var + self.eps)
+        if self.affine:
+            return normalized_output * self.weight + self.bias
+        return normalized_output
+
+
+
+
+
+
+
         return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
