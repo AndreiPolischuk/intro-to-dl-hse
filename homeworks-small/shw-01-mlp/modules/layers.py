@@ -7,6 +7,7 @@ class Linear(Module):
     """
     Applies linear (affine) transformation of data: y = x W^T + b
     """
+
     def __init__(self, in_features: int, out_features: int, bias: bool = True):
         """
         :param in_features: input vector features
@@ -79,6 +80,7 @@ class BatchNormalization(Module):
     """
     Applies batch normalization transformation
     """
+
     def __init__(self, num_features: int, eps: float = 1e-5, momentum: float = 0.1, affine: bool = True):
         """
         :param num_features:
@@ -122,26 +124,23 @@ class BatchNormalization(Module):
             self.norm_input = self.input_mean / np.sqrt(self.var + self.eps)
 
             self.running_mean = self.running_mean * (1 - self.momentum) + self.momentum * self.mean
-            self.running_var = self.running_var * (1 - self.momentum) + self.momentum * self.var * input.shape[0] / (input.shape[0] - 1)
-
-
+            self.running_var = self.running_var * (1 - self.momentum) + self.momentum * self.var * input.shape[0] / (
+                        input.shape[0] - 1)
 
             if self.affine:
                 return self.norm_input * self.weight + self.bias
             return self.norm_input
 
+        self.mean = np.mean(input, axis=0)
+        self.var = np.var(input, axis=0, ddof=0)
+        self.input_mean = (input - self.mean)
+        self.norm_input = self.input_mean / np.sqrt(self.var + self.eps)
+
         normalized_output = (input - self.running_mean) / np.sqrt(self.running_var + self.eps)
+
         if self.affine:
             return normalized_output * self.weight + self.bias
         return normalized_output
-
-
-
-
-
-
-
-        return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
         """
@@ -150,7 +149,36 @@ class BatchNormalization(Module):
         :return: array of shape (batch_size, num_features)
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        return super().compute_grad_input(input, grad_output)
+
+        if self.training:
+
+            xhat_grad = grad_output
+
+            if self.affine:
+                xhat_grad = xhat_grad * self.weight
+
+            var_grad = np.sum(xhat_grad * self.input_mean * -0.5 * np.power((self.var + self.eps), (-3 / 2)), axis=0)
+
+            self.inv_sqrt_var = 1 / np.sqrt(self.var + self.eps)
+
+            mean_grad = (np.sum(xhat_grad * -self.inv_sqrt_var, axis=0)
+                         + var_grad * (np.sum((-2 * self.input_mean) / input.shape[0], axis=0)))
+
+            xi_grad = (xhat_grad * self.inv_sqrt_var
+                       + var_grad * 2 * self.input_mean / input.shape[0]
+                       + mean_grad / input.shape[0])
+
+            return xi_grad
+
+        xi_grad = grad_output
+        if self.affine:
+            xi_grad = xi_grad * self.weight
+
+        run_inv_sq_var = 1 / np.sqrt(self.running_var + self.eps)
+        xi_grad = xi_grad * run_inv_sq_var
+
+        return xi_grad
+
 
     def update_grad_parameters(self, input: np.ndarray, grad_output: np.ndarray):
         """
@@ -158,7 +186,18 @@ class BatchNormalization(Module):
         :param grad_output: array of shape (batch_size, num_features)
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        super().update_grad_parameters(input, grad_output)
+
+
+
+        if self.bias is not None:
+            self.grad_bias += np.sum(grad_output, axis=0)
+
+        normalized_input = self.norm_input
+
+
+
+        self.grad_weight += np.sum(grad_output * normalized_input, axis=0)
+
 
     def zero_grad(self):
         if self.affine:
@@ -180,6 +219,7 @@ class Dropout(Module):
     """
     Applies dropout transformation
     """
+
     def __init__(self, p=0.5):
         super().__init__()
         assert 0 <= p < 1
@@ -200,6 +240,7 @@ class Dropout(Module):
         :param grad_output: array of the same size
         :return: array of the same size
         """
+
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
         return super().compute_grad_input(input, grad_output)
 
@@ -211,6 +252,7 @@ class Sequential(Module):
     """
     Container for consecutive application of modules
     """
+
     def __init__(self, *args):
         super().__init__()
         self.modules = list(args)
