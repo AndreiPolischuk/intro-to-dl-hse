@@ -131,10 +131,8 @@ class BatchNormalization(Module):
                 return self.norm_input * self.weight + self.bias
             return self.norm_input
 
-        self.mean = np.mean(input, axis=0)
-        self.var = np.var(input, axis=0, ddof=0)
-        self.input_mean = (input - self.mean)
-        self.norm_input = self.input_mean / np.sqrt(self.var + self.eps)
+
+        self.norm_input = (input - self.running_mean) / np.sqrt(self.running_var + self.eps)
 
         normalized_output = (input - self.running_mean) / np.sqrt(self.running_var + self.eps)
 
@@ -194,9 +192,10 @@ class BatchNormalization(Module):
 
         normalized_input = self.norm_input
 
+        if self.grad_weight is not None:
 
 
-        self.grad_weight += np.sum(grad_output * normalized_input, axis=0)
+            self.grad_weight += np.sum(grad_output * normalized_input, axis=0)
 
 
     def zero_grad(self):

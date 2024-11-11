@@ -68,9 +68,14 @@ def test_module(custom_module, torch_module, input_shape, module_kwargs=None,
             grad_output = np.random.randn(*y1.shape)
             y2.backward(torch.from_numpy(grad_output))
             grad_input = module1.backward(x1, grad_output)
+            meow = x2.grad.numpy()
             assert_almost_equal(x2.grad.numpy(), grad_input, debug_msg + 'input grad: {}')
 
             # check parameters grad
+
+            if eval_module:
+                print('3')
+
             for attr in param_attrs:
                 assert_almost_equal(
                     getattr(module1, 'grad_' + attr),
