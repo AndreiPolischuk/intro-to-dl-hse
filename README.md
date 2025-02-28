@@ -19,6 +19,7 @@
 ## Лекции
 
 [Глоссарий](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/glossary.md) с терминами.
+
 1. Метод обратного распространения ошибки, полносвязные нейронные сети: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-01-mlp.pdf), [конспект](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-latex/notes-01-mlp.pdf)
 2. Кросс-энтропийная функция потерь, Dropout, Batch Normalization: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-02-dropout-batchnorm.pdf)
 3. Оптимизация нейронных сетей: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-03-optimization.pdf)
@@ -32,7 +33,7 @@
 11. Трансформеры для компьютерного зрения: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-11-vit.pdf), [запись](https://disk.yandex.ru/i/QNtUCrvxb24asg)
 12. Оптимизации для применения нейронных сетей: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-12-opt-inference.pdf)
 13. Соревновательные атаки, генеративно-состязательные сети (GANs): [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-13-adversarial.pdf)
-14. Вариационный автокодировщик: [запись](https://disk.yandex.ru/d/POUjqjxfusqsJA), [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-14-vae.pdf)
+14. Вариационный автокодировщик: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-14-vae.pdf), [запись](https://disk.yandex.ru/d/POUjqjxfusqsJA)
 
 ## Семинары
 
