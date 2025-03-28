@@ -31,7 +31,7 @@
 9. Архитектура трансформера: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-09-transformer.pdf)
 10. Self-supervised learning, BERT, SimCLR: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-10-self-supervised.pdf)
 11. Трансформеры для компьютерного зрения: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-11-vit.pdf), [запись](https://disk.yandex.ru/i/QNtUCrvxb24asg)
-12. Оптимизации для применения нейронных сетей: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-12-opt-inference.pdf)
+12. Оптимизации для применения нейронных сетей: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-12-opt-inference.pdf), [конспект](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-latex/notes-12-opt-inference.pdf)
 13. Соревновательные атаки, генеративно-состязательные сети (GANs): [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-13-adversarial.pdf), [конспект](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-latex/notes-13-adversarial.pdf)
 14. Вариационный автокодировщик: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-14-vae.pdf), [запись](https://disk.yandex.ru/d/POUjqjxfusqsJA), [конспект](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-latex/notes-14-vae.pdf)
 15. Диффузионные модели: [доска](https://github.com/xiyori/intro-to-dl-hse/blob/2024-2025/lecture-notes/notes-15-diffusion.pdf)
