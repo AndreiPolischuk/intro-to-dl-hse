@@ -40,11 +40,10 @@ class SGD(Optimizer):
             if self.momentum != 0:
               if np.all(m == 0):
                 np.add(m, gr, out=m)
-
+                np.add(param, - m  * self.lr, out=param)
               else:
-                np.add(m * self.momentum,  gr, out=m) 
-              
-              np.add(param, - self.lr * (m), out=param)
+                np.add(m * self.momentum, (1 - self.momentum) * gr, out=m)
+                np.add(param, - m  * self.lr, out=param)
             else:
               np.add(param, - self.lr * gr, out=param)
             
@@ -95,27 +94,4 @@ class Adam(Optimizer):
             hint: consider using np.add(..., out=m) for in place addition,
               i.e. we need to change original array, not its copy
             """
-            
-            #self.state['t'] += 1
-            
-            
-            
-            gr = grad if self.weight_decay == 0 else grad + self.weight_decay * (param  )
-            
-            np.add(self.beta1 * m, (1 - self.beta1) * gr, out = m) # Здесь может быть проблема как в прошлый раз
-            
-            np.add(self.beta2 * v, (1 - self.beta2) * (gr ** 2), out = v)
-            
-            m_hat = m  / (1 - self.beta1 ** t) # тут может быть проблема что ха бета1 с крышкой??
-            
-            v_hat = v / (1 - self.beta2 ** t)
-            
-            np.add(param, - self.lr * m_hat / (np.sqrt(v_hat) + self.eps), out = param)
-            
-            
-            
-            
-            
-            
-            
             pass

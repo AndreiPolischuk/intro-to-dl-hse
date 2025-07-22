@@ -100,7 +100,7 @@ class Adam(Optimizer):
             
             
             
-            gr = grad if self.weight_decay == 0 else grad + self.weight_decay * (param  )
+            gr = grad if self.weight_decay == 0 else grad + self.weight_decay * (param ** 2 )
             
             np.add(self.beta1 * m, (1 - self.beta1) * gr, out = m) # Здесь может быть проблема как в прошлый раз
             

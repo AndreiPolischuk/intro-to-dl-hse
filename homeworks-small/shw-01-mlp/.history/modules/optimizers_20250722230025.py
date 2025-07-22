@@ -35,7 +35,7 @@ class SGD(Optimizer):
               i.e. we need to change original array, not its copy
             """
             
-            gr = grad if self.weight_decay == 0 else grad + self.weight_decay * (param )
+            gr = grad if self.weight_decay == 0 else grad + self.weight_decay * (param ** 2)
             
             if self.momentum != 0:
               if np.all(m == 0):
@@ -87,35 +87,25 @@ class Adam(Optimizer):
         self.state['t'] += 1
         t = self.state['t']
         for param, grad, m, v in zip(parameters, gradients, self.state['m'], self.state['v']):
-            """
-            your code here ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-              - update first moment variable (m)
-              - update second moment variable (v)
-              - update parameter variable (param)
-            hint: consider using np.add(..., out=m) for in place addition,
-              i.e. we need to change original array, not its copy
-            """
+            # Apply weight decay
+            if self.weight_decay != 0:
+                grad = grad + self.weight_decay * param
             
-            #self.state['t'] += 1
-            
-            
-            
-            gr = grad if self.weight_decay == 0 else grad + self.weight_decay * (param  )
-            
-            np.add(self.beta1 * m, (1 - self.beta1) * gr, out = m) # Здесь может быть проблема как в прошлый раз
-            
-            np.add(self.beta2 * v, (1 - self.beta2) * (gr ** 2), out = v)
-            
-            m_hat = m  / (1 - self.beta1 ** t) # тут может быть проблема что ха бета1 с крышкой??
-            
+            # Update first moment (m)
+            # m_t = beta1 * m_{t-1} + (1 - beta1) * g_t
+            np.multiply(m, self.beta1, out=m)
+            np.add(m, (1 - self.beta1) * grad, out=m)
+
+            # Update second moment (v)
+            # v_t = beta2 * v_{t-1} + (1 - beta2) * g_t^2
+            np.multiply(v, self.beta2, out=v)
+            np.add(v, (1 - self.beta2) * (grad ** 2), out=v)
+
+            # Bias correction
+            m_hat = m / (1 - self.beta1 ** t)
             v_hat = v / (1 - self.beta2 ** t)
-            
-            np.add(param, - self.lr * m_hat / (np.sqrt(v_hat) + self.eps), out = param)
-            
-            
-            
-            
-            
-            
-            
-            pass
+
+            # Update parameter
+            # param_t = param_{t-1} - lr * m_hat / (sqrt(v_hat) + eps)
+            update = self.lr * m_hat / (np.sqrt(v_hat) + self.eps)
+            np.subtract(param, update, out=param)
