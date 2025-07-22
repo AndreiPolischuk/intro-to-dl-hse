@@ -73,50 +73,35 @@ class Sigmoid(Module):
 
 class Softmax(Module):
     """
-    Applies Softmax operator over the last dimension
+    Applies softmax over the last dimension.
+    Works for any shape; last axis is treated as 'classes'.
     """
+
     def compute_output(self, input: np.ndarray) -> np.ndarray:
         """
-        :param input: array of size (batch_size, num_classes)
-        :return: array of the same size
+        input : (batch_size, num_classes)
+        return: same shape, softmax along last axis
         """
-        # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        exps = np.exp(input)
-        
-        column_exps = np.sum(exps, axis=1, keepdims=True)
-        
-        output = exps / column_exps
-        
-        return output
-        
-        return super().compute_output(input)
+        # численно устойчивый сдвиг
+        x_shift = input - input.max(axis=-1, keepdims=True)
+        exps    = np.exp(x_shift)
+        denom   = np.sum(exps, axis=-1, keepdims=True)   # <- axis=-1!
+        self.output = exps / denom                       # сохраняем для backward
+        return self.output
 
-    def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
+    def compute_grad_input(self,
+                           input: np.ndarray,
+                           grad_output: np.ndarray) -> np.ndarray:
         """
-        :param input: array of size (batch_size, num_classes)
-        :param grad_output: array of the same size
-        :return: array of the same size
+        grad_output has the same shape as input/output.
+        Uses vectorized Jacobian‑product:  y ⊙ (g − (y·g))
         """
-        # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        
-        exps = np.exp(input)
-        
-        column_exps = np.sum(exps, axis=1, keepdims=True)
-        
-        output = exps / column_exps
-        
-        
-        
-        col_dot = np.sum(grad_output * output, axis=1, keepdims=True)
-        
-        grad = output * (grad_output - col_dot)
-        
-        return grad
-        
-        
-        return super().compute_grad_input(input, grad_output)
+        # self.output уже посчитан на forward
+        y = self.output
+        # скалярное произведение (y · g) для каждой строки, keepdims=true
+        dot = np.sum(grad_output * y, axis=-1, keepdims=True)
+        grad_input = y * (grad_output - dot)
+        return grad_input
 
 
 class LogSoftmax(Module):
@@ -129,16 +114,6 @@ class LogSoftmax(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        exps = np.exp(input)
-        
-        sumxp = np.sum(exps, axis=1, keepdims=True)
-        
-        output = input - np.log(sumxp)
-        
-        return output
-        
-        
         return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
@@ -148,21 +123,4 @@ class LogSoftmax(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        softmax = np.exp(self.output) if hasattr(self, "output") else (
-            np.exp(input - np.max(input, axis=-1, keepdims=True)) /
-            np.sum(np.exp(input - np.max(input, axis=-1, keepdims=True)),
-                   axis=-1, keepdims=True)
-        )
-
-        # 2. Скалярная сумма градиентов по каждой строке
-        sum_grad = np.sum(grad_output, axis=-1, keepdims=True)   # (B, 1)
-
-        # 3. Итоговый градиент
-        grad_input = grad_output - sum_grad * softmax            # (B, C)
-
-        return grad_input
-        
-        
-        
         return super().compute_grad_input(input, grad_output)

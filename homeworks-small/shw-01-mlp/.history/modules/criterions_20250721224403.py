@@ -77,12 +77,11 @@ class CrossEntropyLoss(Criterion):
 
     def compute_grad_input(self, input: np.ndarray, target: np.ndarray) -> np.ndarray:
         """
-        :param input: logits array of size (batch_size, num_classes)
-        :param target: labels array of size (batch_size, )
-        :return: array of size (batch_size, num_classes)
+        :param input: logits, shape (B, C)
+        :param target: class indices (B,) или one‑hot (B, C)
+        :return: dL/d(input), shape (B, C)
         """
-        # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
+        # ----- 1. One‑hot‑маска y ---------------------------------------
         B, C = input.shape
         if target.ndim == 1:                       # целочисленные метки
             mask = np.zeros((B, C), dtype=input.dtype)
@@ -98,7 +97,7 @@ class CrossEntropyLoss(Criterion):
         # ----- 3. Градиент для mean‑reduction --------------------------
         grad_input = (softmax - mask) / B          # (B, C)
 
-        return grad_input
+        return grad_input 
         
         
 

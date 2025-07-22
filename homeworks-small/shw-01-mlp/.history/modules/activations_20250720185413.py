@@ -63,7 +63,7 @@ class Sigmoid(Module):
         
         sigma = 1 / (1 + np.exp(-input))
         
-        return sigma * (1 - sigma) * grad_output
+        return sigma * (1 - sigma)
         
         return 
         
@@ -81,15 +81,6 @@ class Softmax(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        exps = np.exp(input)
-        
-        column_exps = np.sum(exps, axis=1, keepdims=True)
-        
-        output = exps / column_exps
-        
-        return output
-        
         return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
@@ -99,23 +90,6 @@ class Softmax(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        
-        exps = np.exp(input)
-        
-        column_exps = np.sum(exps, axis=1, keepdims=True)
-        
-        output = exps / column_exps
-        
-        
-        
-        col_dot = np.sum(grad_output * output, axis=1, keepdims=True)
-        
-        grad = output * (grad_output - col_dot)
-        
-        return grad
-        
-        
         return super().compute_grad_input(input, grad_output)
 
 
@@ -129,16 +103,6 @@ class LogSoftmax(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        exps = np.exp(input)
-        
-        sumxp = np.sum(exps, axis=1, keepdims=True)
-        
-        output = input - np.log(sumxp)
-        
-        return output
-        
-        
         return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
@@ -148,21 +112,4 @@ class LogSoftmax(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        softmax = np.exp(self.output) if hasattr(self, "output") else (
-            np.exp(input - np.max(input, axis=-1, keepdims=True)) /
-            np.sum(np.exp(input - np.max(input, axis=-1, keepdims=True)),
-                   axis=-1, keepdims=True)
-        )
-
-        # 2. Скалярная сумма градиентов по каждой строке
-        sum_grad = np.sum(grad_output, axis=-1, keepdims=True)   # (B, 1)
-
-        # 3. Итоговый градиент
-        grad_input = grad_output - sum_grad * softmax            # (B, C)
-
-        return grad_input
-        
-        
-        
         return super().compute_grad_input(input, grad_output)

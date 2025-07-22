@@ -145,7 +145,7 @@ class BatchNormalization(Module):
             
             self.running_mean = (1 - self.momentum) * self.running_mean + self.momentum * mu
             
-            self.running_var = (1 - self.momentum) * self.running_var + self.momentum * self.var * input.shape[0] / (input.shape[0] - 1)
+            self.running_var = (1 - self.momentum) * self.running_var + self.momentum * input.shape[0] / (input.shape[0] - 1)
 
             output = (input - mu) / np.sqrt(sigma2 + self.eps)
             
@@ -181,16 +181,9 @@ class BatchNormalization(Module):
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
         
-        gamma = self.weight if self.affine else 1.0
         
-        if self.training:
-           
-            
-            output = gamma / (input.shape[0] * np.sqrt(self.var + self.eps)) * (input.shape[0] * grad_output - np.sum(grad_output, axis=0) - self.norm_input * np.sum(grad_output*self.norm_input, axis=0)) 
-            return output
-        else:
-           inv_std = gamma / np.sqrt(self.running_var + self.eps)
-           return grad_output * inv_std
+        
+        
         return super().compute_grad_input(input, grad_output)
 
     def update_grad_parameters(self, input: np.ndarray, grad_output: np.ndarray):
@@ -203,8 +196,8 @@ class BatchNormalization(Module):
         if not self.affine:
             return
         else:
-            self.grad_bias += np.sum(grad_output, axis = 0)
-            self.grad_weight += np.sum(self.norm_input * grad_output, axis=0)
+            self.grad_bias = np.sum(grad_output, axis = 0)
+            self.grad_weight = np.sum(self.norm_input * grad_output, axis=0)
         
         super().update_grad_parameters(input, grad_output)
 
@@ -240,16 +233,6 @@ class Dropout(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        if self.training:
-            rng = np.random.default_rng() 
-            self.mask = rng.random(size=input.shape) < (1 - self.p)
-            self.mask = self.mask.astype(input.dtype) * (1.0 / (1 - self.p))
-            return input * self.mask
-            
-        else:
-            return input
-        
         return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
@@ -259,12 +242,6 @@ class Dropout(Module):
         :return: array of the same size
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        if self.training:
-            return grad_output * self.mask
-        else:
-            return grad_output
-        
         return super().compute_grad_input(input, grad_output)
 
     def __repr__(self) -> str:
@@ -278,7 +255,6 @@ class Sequential(Module):
     def __init__(self, *args):
         super().__init__()
         self.modules = list(args)
-        self.inputs = list()
 
     def compute_output(self, input: np.ndarray) -> np.ndarray:
         """
@@ -286,17 +262,6 @@ class Sequential(Module):
         :return: array of size matching the output size of the last layer
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        x = input
-        self.inputs.append(x)
-        
-        for module in self.modules:
-            x = module.compute_output(x)
-            self.inputs.append(x)
-        self.inputs.pop()
-        
-        return x
-        
         return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
@@ -306,16 +271,6 @@ class Sequential(Module):
         :return: array of size matching the input size of the first layer
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        grad_out = grad_output
-        
-        for module, input in zip(reversed(self.modules), reversed(self.inputs)):
-            module.update_grad_parameters(input, grad_out)
-            grad_out = module.compute_grad_input(input, grad_out)
-
-        return grad_out
-            
-        
         return super().compute_grad_input(input, grad_output)
 
     def __getitem__(self, item):

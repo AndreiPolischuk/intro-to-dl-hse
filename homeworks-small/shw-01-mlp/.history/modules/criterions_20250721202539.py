@@ -46,30 +46,29 @@ class CrossEntropyLoss(Criterion):
     """
     Cross-entropy criterion over distribution logits
     """
+    def __init__(self):
+        super().__init__()
+        self.log_softmax = LogSoftmax()
 
-    # ---------- forward ----------
     def compute_output(self, input: np.ndarray, target: np.ndarray) -> float:
         """
-        :param input: logits, shape (B, C)
-        :param target: class indices (B,)  *or* one‑hot matrix (B, C)
-        :return: scalar mean loss
+        :param input: logits array of size (batch_size, num_classes)
+        :param target: labels array of size (batch_size, )
+        :return: loss value
         """
-        self.log_softmax = LogSoftmax()   # reuse the module you already wrote
-        self._log_probs = None            # cache needed for backward
+        # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
         
-        # 1) log‑softmax once, numerically stable
-        self._log_probs = self.log_softmax(input)          # (B, C)
-
-        # 2) pick correct log‑probs
-        if target.ndim == 1:                               # integer labels
-            loss_sample = -self._log_probs[
-                np.arange(input.shape[0]), target
-            ]
-        else:                                              # one‑hot mask
-            loss_sample = -np.sum(self._log_probs * target, axis=1)
-
-        # 3) mean over batch
-        return (np.mean(loss_sample))
+        
+        probs = np.exp(input)
+        
+        sum_probs = np.sum(probs, axis=1, keepdims=True)
+        
+        probs = probs / sum_probs
+        
+        loss = - 1 / (input.shape[0]) * np.sum( (probs - np.log(sum_probs)) * target )
+        
+        return loss
+        
         
         
         
@@ -82,25 +81,4 @@ class CrossEntropyLoss(Criterion):
         :return: array of size (batch_size, num_classes)
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        B, C = input.shape
-        if target.ndim == 1:                       # целочисленные метки
-            mask = np.zeros((B, C), dtype=input.dtype)
-            mask[np.arange(B), target] = 1.0
-        else:                                      # уже one‑hot
-            mask = target.astype(input.dtype)
-
-        # ----- 2. Softmax (численно устойчивый) ------------------------
-        shifted = input - np.max(input, axis=1, keepdims=True)  # (B, C)
-        exp_shifted = np.exp(shifted)
-        softmax = exp_shifted / np.sum(exp_shifted, axis=1, keepdims=True)
-
-        # ----- 3. Градиент для mean‑reduction --------------------------
-        grad_input = (softmax - mask) / B          # (B, C)
-
-        return grad_input
-        
-        
-
-        
         return super().compute_grad_input(input, target)

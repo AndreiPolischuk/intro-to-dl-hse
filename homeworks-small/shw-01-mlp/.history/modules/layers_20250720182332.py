@@ -278,7 +278,6 @@ class Sequential(Module):
     def __init__(self, *args):
         super().__init__()
         self.modules = list(args)
-        self.inputs = list()
 
     def compute_output(self, input: np.ndarray) -> np.ndarray:
         """
@@ -286,17 +285,6 @@ class Sequential(Module):
         :return: array of size matching the output size of the last layer
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        x = input
-        self.inputs.append(x)
-        
-        for module in self.modules:
-            x = module.compute_output(x)
-            self.inputs.append(x)
-        self.inputs.pop()
-        
-        return x
-        
         return super().compute_output(input)
 
     def compute_grad_input(self, input: np.ndarray, grad_output: np.ndarray) -> np.ndarray:
@@ -306,16 +294,6 @@ class Sequential(Module):
         :return: array of size matching the input size of the first layer
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        grad_out = grad_output
-        
-        for module, input in zip(reversed(self.modules), reversed(self.inputs)):
-            module.update_grad_parameters(input, grad_out)
-            grad_out = module.compute_grad_input(input, grad_out)
-
-        return grad_out
-            
-        
         return super().compute_grad_input(input, grad_output)
 
     def __getitem__(self, item):

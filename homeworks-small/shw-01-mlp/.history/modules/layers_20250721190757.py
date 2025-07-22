@@ -310,9 +310,7 @@ class Sequential(Module):
         grad_out = grad_output
         
         for module, input in zip(reversed(self.modules), reversed(self.inputs)):
-            module.update_grad_parameters(input, grad_out)
             grad_out = module.compute_grad_input(input, grad_out)
-
         return grad_out
             
         

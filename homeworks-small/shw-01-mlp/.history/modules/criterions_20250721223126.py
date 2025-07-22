@@ -83,20 +83,20 @@ class CrossEntropyLoss(Criterion):
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
         
-        B, C = input.shape
-        if target.ndim == 1:                       # целочисленные метки
-            mask = np.zeros((B, C), dtype=input.dtype)
-            mask[np.arange(B), target] = 1.0
-        else:                                      # уже one‑hot
-            mask = target.astype(input.dtype)
+        if target.ndim == 1:
+            C = input.shape[1]
+            mask = np.eye(C, dtype=input.dtype)[target]   # (B, C)
+        else:
+            mask = target                                 # уже one‑hot
 
-        # ----- 2. Softmax (численно устойчивый) ------------------------
-        shifted = input - np.max(input, axis=1, keepdims=True)  # (B, C)
-        exp_shifted = np.exp(shifted)
-        softmax = exp_shifted / np.sum(exp_shifted, axis=1, keepdims=True)
+    # 2. считаем softmax (стабильно)
+        softmax = np.exp(self.output) if hasattr(self, "output") else (
+        np.exp(input - np.max(input, axis=-1, keepdims=True)) /
+        np.sum(np.exp(input - np.max(input, axis=-1, keepdims=True)), axis=-1, keepdims=True)
+        )
 
-        # ----- 3. Градиент для mean‑reduction --------------------------
-        grad_input = (softmax - mask) / B          # (B, C)
+    # 3. правильный градиент: (softmax − mask) / B
+        grad_input = (softmax - mask) / input.shape[0]
 
         return grad_input
         

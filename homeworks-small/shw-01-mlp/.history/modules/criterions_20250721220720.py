@@ -46,6 +46,10 @@ class CrossEntropyLoss(Criterion):
     """
     Cross-entropy criterion over distribution logits
     """
+    def __init__(self):
+        #super().__init__()
+        self.log_softmax = LogSoftmax()   # reuse the module you already wrote
+        self._log_probs = None            # cache needed for backward
 
     # ---------- forward ----------
     def compute_output(self, input: np.ndarray, target: np.ndarray) -> float:
@@ -54,9 +58,6 @@ class CrossEntropyLoss(Criterion):
         :param target: class indices (B,)  *or* one‑hot matrix (B, C)
         :return: scalar mean loss
         """
-        self.log_softmax = LogSoftmax()   # reuse the module you already wrote
-        self._log_probs = None            # cache needed for backward
-        
         # 1) log‑softmax once, numerically stable
         self._log_probs = self.log_softmax(input)          # (B, C)
 
@@ -69,7 +70,7 @@ class CrossEntropyLoss(Criterion):
             loss_sample = -np.sum(self._log_probs * target, axis=1)
 
         # 3) mean over batch
-        return (np.mean(loss_sample))
+        return float(np.mean(loss_sample))
         
         
         
@@ -83,20 +84,18 @@ class CrossEntropyLoss(Criterion):
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
         
-        B, C = input.shape
-        if target.ndim == 1:                       # целочисленные метки
-            mask = np.zeros((B, C), dtype=input.dtype)
-            mask[np.arange(B), target] = 1.0
-        else:                                      # уже one‑hot
-            mask = target.astype(input.dtype)
+                 
+        softmax = np.exp(self.output) if hasattr(self, "output") else (
+            np.exp(input - np.max(input, axis=-1, keepdims=True)) /
+            np.sum(np.exp(input - np.max(input, axis=-1, keepdims=True)),
+                   axis=-1, keepdims=True)
+        )
 
-        # ----- 2. Softmax (численно устойчивый) ------------------------
-        shifted = input - np.max(input, axis=1, keepdims=True)  # (B, C)
-        exp_shifted = np.exp(shifted)
-        softmax = exp_shifted / np.sum(exp_shifted, axis=1, keepdims=True)
+        # 2. Скалярная сумма градиентов по каждой строке
+        # sum_grad = np.sum(grad_output, axis=-1, keepdims=True)   # (B, 1)
 
-        # ----- 3. Градиент для mean‑reduction --------------------------
-        grad_input = (softmax - mask) / B          # (B, C)
+        # 3. Итоговый градиент
+        grad_input = -1 * input.shape[0] *  (target  * softmax )           # (B, C)
 
         return grad_input
         

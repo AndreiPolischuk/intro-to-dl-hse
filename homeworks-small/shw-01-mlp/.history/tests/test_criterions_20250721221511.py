@@ -31,12 +31,10 @@ def test_criterion(input_shape, mse=True, outer_iters=100, random_seed=None):
         y1 = np.random.randn(*input_shape) if mse \
             else np.random.randint(input_shape[1], size=(input_shape[0], ))
             
+            
 
         x2 = torch.from_numpy(x1)
-        if mse:
-            y2 = torch.from_numpy(y1)  # float OK
-        else:
-            y2 = torch.from_numpy(y1.astype(np.int64)).long()  # гарантированно int64
+        y2 = torch.from_numpy(y1.astype(np.int64))
 
         x2.requires_grad = True
 
