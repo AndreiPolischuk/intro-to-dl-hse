@@ -1,5 +1,3 @@
-import numpy as np
-
 class DataLoader(object):
     """
     Tool for shuffling data and forming mini-batches
@@ -23,11 +21,6 @@ class DataLoader(object):
         :return: number of batches per epoch
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        length = self.X.shape[0] // self.batch_size if self.X.shape[0] % self.batch_size == 0 else self.X.shape[0] // self.batch_size + 1
-        
-        return length
-        
         return 0
 
     def num_samples(self) -> int:
@@ -35,9 +28,6 @@ class DataLoader(object):
         :return: number of data samples
         """
         # replace with your code ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        return self.X.shape[0]
-        
         return 0
 
     def __iter__(self):
@@ -46,15 +36,6 @@ class DataLoader(object):
         :return: self
         """
         # your code here ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        self.batch_id = 0
-        
-        if self.shuffle:
-            indices = np.random.permutation(self.X.shape[0])
-
-            # Применяем перемешивание как к первому, так и ко второму массиву
-            self.X = self.X[indices]
-            self.y = self.y[indices]
-        
         return self
 
     def __next__(self):
@@ -63,12 +44,4 @@ class DataLoader(object):
         :return: (x_batch, y_batch)
         """
         # your code here ｀、ヽ｀、ヽ(ノ＞＜)ノ ヽ｀☂｀、ヽ
-        
-        size = len(self)
-        
-        self.batch_id += 1
-        
-        if self.batch_id > size:
-            raise StopIteration
-        
-        return (self.X[(self.batch_id - 1) * self.batch_size  : (self.batch_id) * self.batch_size ], self.y[(self.batch_id - 1) * self.batch_size : (self.batch_id) * self.batch_size])
+        raise StopIteration

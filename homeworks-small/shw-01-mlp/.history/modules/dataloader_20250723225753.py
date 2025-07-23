@@ -71,4 +71,4 @@ class DataLoader(object):
         if self.batch_id > size:
             raise StopIteration
         
-        return (self.X[(self.batch_id - 1) * self.batch_size  : (self.batch_id) * self.batch_size ], self.y[(self.batch_id - 1) * self.batch_size : (self.batch_id) * self.batch_size])
+        return (self.X[(self.batch_id - 1) * self.batch_size - 1 : (self.batch_id) * self.batch_size - 1], self.y[(self.batch_id - 1) * self.batch_size - 1 : (self.batch_id) * self.batch_size - 1])
